@@ -10,7 +10,7 @@ client.counter = 0
 def test_read_main():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"message": "Hello World"}
+    assert response.json() == {"message": "Hello world!"}
 
 @pytest.mark.parametrize("name", ['Adam', 'Miro', 'Jason'])
 def test_hello_name(name):

@@ -6,7 +6,7 @@ app.counter = 0
 
 @app.get("/")
 def root_view():
-	return {"message": "Hello World!"}
+	return {"message": "Hello world!"}
 
 @app.get('/counter')
 def counter():
