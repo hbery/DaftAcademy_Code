@@ -18,12 +18,18 @@ def test_hello_name(name):
     assert response.status_code == 200
     assert response.json() == {"msg": f"Hello {name}"}
 
-def test_counter():
-    response = client.get(f"/counter")
-    assert response.status_code == 200
-    assert response.text == "1"
+# def test_counter():
+#     response = client.get(f"/counter")
+#     assert response.status_code == 200
+#     assert response.text == "1"
     
-    # 2nd Try
-    response = client.get(f"/counter")
-    assert response.status_code == 200
-    assert response.text == "2"
+#     # 2nd Try
+#     response = client.get(f"/counter")
+#     assert response.status_code == 200
+#     assert response.text == "2"
+
+@pytest.mark.parametrize("method", ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE'])
+def test_method(method):
+    response = client.request(method=method, url="/method")
+    assert response.status_code == 200 if method != 'POST' else response.status_code == 201
+    assert response.json() == {"method": f"{method}"}
