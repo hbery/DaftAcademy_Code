@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Request, Response, status
-from models import HelloResp
+from fastapi import FastAPI, Body, Request, Response, status
+from models import HelloResp, Person, RegisteredPerson
 from hashlib import sha512
+from datetime import date, timedelta
 
 app = FastAPI()
 app.counter = 0
+app.id = 0
 
 @app.get("/")
 def root_view():
@@ -38,3 +40,17 @@ async def authorize(response: Response, password: str = '', password_hash: str =
 
 	response.status_code = status.HTTP_401_UNAUTHORIZED
 	return
+
+@app.post('/register', response_model=RegisteredPerson)
+async def register_new_user(response: Response, person: Person):
+	response.status_code = status.HTTP_201_CREATED
+	today = date.today()
+	vac_date = today + timedelta(days=(len(person.name) + len(person.surname)))
+	app.id += 1
+	return RegisteredPerson(
+		id=app.id, 
+		name=person.name, 
+		surname=person.surname, 
+		register_date=today.strftime("%Y-%m-%d"), 
+		vaccination_date=vac_date.strftime("%Y-%m-%d")
+		)

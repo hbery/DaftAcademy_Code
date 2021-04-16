@@ -1,8 +1,10 @@
 from fastapi.testclient import TestClient
 import pytest
 import json
+from datetime import date, timedelta
 
 from main import app
+from models import Person, RegisteredPerson
 
 client = TestClient(app)
 client.counter = 0
@@ -47,3 +49,14 @@ def test_password_empty():
 def test_password_fail():
     response = client.get("/auth?password=haslo&password_hash=f34ad4b3ae1e2cf33092e2abb60dc0444781c15d0e2e9ecdb37e4b14176a0164027b05900e09fa0f61a1882e0b89fbfa5dcfcc9765dd2ca4377e2c794837e091")
     assert response.status_code == 401
+
+@pytest.mark.parametrize("new_user", [Person(name='Jan', surname='Kowalski'), Person(name='Anna', surname='Nowak')])
+def test_registartion(new_user: Person):
+    response = client.post(url='/register', data=new_user.json())
+    assert response.status_code == 201 
+    assert type(response.json()['id']) == int 
+    assert response.json()['name'] == new_user.name
+    assert response.json()['surname'] == new_user.surname
+    assert response.json()['register_date'] == date.today().strftime(format="%Y-%m-%d")
+    vac_date = date.today() + timedelta(days=(len(new_user.name) + len(new_user.surname)))
+    assert response.json()['vaccination_date'] == vac_date.strftime(format="%Y-%m-%d")
