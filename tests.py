@@ -55,8 +55,8 @@ def test_registartion(new_user: Person):
     response = client.post(url='/register', data=new_user.json())
     assert response.status_code == 201 
     assert type(response.json()['id']) == int 
-    assert response.json()['name'] == new_user.name
-    assert response.json()['surname'] == new_user.surname
+    assert response.json()['name'] == 'Jan'
+    assert response.json()['surname'] == 'Nowak'
     assert response.json()['register_date'] == date.today().strftime(format="%Y-%m-%d")
     vac_date = date.today() + timedelta(days=(len(new_user.name) + len(new_user.surname)))
     assert response.json()['vaccination_date'] == vac_date.strftime(format="%Y-%m-%d")

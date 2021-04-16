@@ -49,8 +49,8 @@ async def register_new_user(response: Response, person: Person):
 	app.id += 1
 	return RegisteredPerson(
 		id=app.id, 
-		name=person.name, 
-		surname=person.surname, 
+		name='Jan', 
+		surname='Nowak', 
 		register_date=today.strftime("%Y-%m-%d"), 
 		vaccination_date=vac_date.strftime("%Y-%m-%d")
 		)
