@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Body, Request, Response, status
+from fastapi_route_log.log_request import LoggingRoute
 
 from models import HelloResp, Person, RegisteredPerson
 from util import calculate_names_length
@@ -6,7 +7,9 @@ from util import calculate_names_length
 from hashlib import sha512
 from datetime import date, timedelta
 
-app = FastAPI(debug=True)
+app = FastAPI()
+app.router.route_class = LoggingRoute
+
 app.counter = 0
 app.id = 0
 
