@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Body, Request, Response, status
+from fastapi import FastAPI, Request, Response, status
 from fastapi_route_log.log_request import LoggingRoute
 
 from models import HelloResp, Person, RegisteredPerson
@@ -12,6 +12,7 @@ app = FastAPI()
 
 app.counter = 0
 app.id = 0
+app.patients = []
 
 @app.get("/")
 def root_view():
@@ -52,10 +53,26 @@ async def register_new_user(response: Response, person: Person):
 	today = date.today()
 	vac_date = today + timedelta(days=calculate_names_length(person.name, person.surname))
 	app.id += 1
-	return RegisteredPerson(
+	patient = RegisteredPerson(
 		id=app.id, 
 		name=person.name, 
 		surname=person.surname, 
 		register_date=today.strftime("%Y-%m-%d"), 
 		vaccination_date=vac_date.strftime("%Y-%m-%d")
 		)
+
+	app.patients.append(patient)
+	return patient
+
+@app.get('/patient/{patient_id}', response_model=RegisteredPerson, status_code=status.HTTP_200_OK)
+async def get_patient(response: Response, patient_id: int):
+	if patient_id < 1:
+		response.status_code = status.HTTP_400_BAD_REQUEST
+		return
+	
+	if patient_id not in [patient.id for patient in app.patients]:
+		response.status_code = status.HTTP_404_NOT_FOUND
+		return
+
+	return [person for person in app.patients if person.id == patient_id][0]
+	

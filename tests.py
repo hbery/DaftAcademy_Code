@@ -52,6 +52,8 @@ def test_password_fail():
     response = client.get("/auth?password=haslo&password_hash=f34ad4b3ae1e2cf33092e2abb60dc0444781c15d0e2e9ecdb37e4b14176a0164027b05900e09fa0f61a1882e0b89fbfa5dcfcc9765dd2ca4377e2c794837e091")
     assert response.status_code == 401
 
+remember_ans = {}
+
 @pytest.mark.parametrize("new_user", [Person(name='Jan', surname='Kowalski'), Person(name='Anna', surname='Nowak'), Person(name='Anna', surname='Nowak-Jurczyńska')])
 def test_registartion(new_user: Person):
     response = client.post(url='/register', data=new_user.json())
@@ -62,3 +64,21 @@ def test_registartion(new_user: Person):
     assert response.json()['register_date'] == date.today().strftime(format="%Y-%m-%d")
     vac_date = date.today() + timedelta(days=calculate_names_length(new_user.name, new_user.surname))
     assert response.json()['vaccination_date'] == vac_date.strftime(format="%Y-%m-%d")
+    remember_ans[response.json()['id']] = response.json()
+
+
+@pytest.mark.parametrize("pat_id", remember_ans.keys())
+def test_getting_patients_ok(pat_id):
+    response = client.get(f'/patient/{pat_id}')
+    assert response.status_code == 200
+    assert response.json() == remember_ans[pat_id]
+
+@pytest.mark.parametrize("pat_id", [400, 500])
+def test_getting_patients_nf(pat_id):
+    response = client.get(f'/patient/{pat_id}')
+    assert response.status_code == 404
+
+@pytest.mark.parametrize("pat_id", [-1, 0])
+def test_getting_patients_br(pat_id):
+    response = client.get(f'/patient/{pat_id}')
+    assert response.status_code == 400
