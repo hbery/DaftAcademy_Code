@@ -8,7 +8,7 @@ from hashlib import sha512
 from datetime import date, timedelta
 
 app = FastAPI()
-app.router.route_class = LoggingRoute
+# app.router.route_class = LoggingRoute
 
 app.counter = 0
 app.id = 0
