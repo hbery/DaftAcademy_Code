@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, Response, status
 from models import HelloResp
+from hashlib import sha512
 
 app = FastAPI()
 app.counter = 0
@@ -25,3 +26,15 @@ def counter():
 @app.get("/hello/{name}", response_model=HelloResp)
 async def hello_name_view(name: str):
     return HelloResp(msg=f"Hello {name}")
+
+@app.get('/auth')
+async def authorize(response: Response, password: str = '', password_hash: str = ''):
+	if password != '' and password_hash != '':
+		calculated_hash = sha512(password.encode()).hexdigest()
+		
+		if password_hash == calculated_hash:
+			response.status_code = status.HTTP_204_NO_CONTENT
+			return
+
+	response.status_code = status.HTTP_401_UNAUTHORIZED
+	return
