@@ -1,16 +1,17 @@
+from functools import wraps
 
-def greetings(wrapped):
+def greetings(wrapped_func):
 	
 	def wrapper(*args, **kwargs):
-		new_string = ' '.join([name.capitalize() for name in wrapped(*args, **kwargs).split(' ')])
+		new_string = ' '.join([name.capitalize() for name in wrapped_func(*args, **kwargs).split(' ')])
 		return f'Hello {new_string}'
 	
 	return wrapper
 
-def is_palindrome(wrapped):
+def is_palindrome(wrapped_func):
 	
 	def wrapper(*args, **kwargs):
-		string = wrapped(*args, **kwargs)
+		string = wrapped_func(*args, **kwargs)
 		clean_string = ''.join([character.lower() for character in string if character.isalnum()])
 
 		if clean_string == clean_string[::-1]:
@@ -22,9 +23,9 @@ def is_palindrome(wrapped):
 
 def format_output(*keys):
 
-	def inner(wrapped):
+	def decorator(wrapped_func):
 		def wrapper(*args, **kwargs):
-			wrapped_dict = wrapped(*args, **kwargs)
+			wrapped_dict = wrapped_func(*args, **kwargs)
 			wd_keys = wrapped_dict.keys()
 
 			new_dict = {}
@@ -43,4 +44,19 @@ def format_output(*keys):
 
 			return new_dict
 		return wrapper
-	return inner
+	return decorator
+
+def add_instance_method(class_def):
+	def decorator(wrapped_func):
+		@wraps(wrapped_func)
+		def wrapper(self, *args, **kwargs):
+			return wrapped_func(*args, **kwargs)
+		setattr(class_def, wrapped_func.__name__, wrapper)
+		return wrapped_func
+	return decorator
+
+def add_class_method(class_def):
+	def decorator(wrapped_func):			
+		setattr(class_def, wrapped_func.__name__, wrapped_func)
+		return wrapped_func
+	return decorator

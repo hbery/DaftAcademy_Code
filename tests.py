@@ -7,7 +7,7 @@ from datetime import date, timedelta
 from main import app
 from models import Person, RegisteredPerson
 from util import calculate_names_length
-from decorators import greetings, is_palindrome, format_output
+from decorators import greetings, is_palindrome, format_output, add_instance_method, add_class_method
 
 
 client = TestClient(app)
@@ -124,3 +124,23 @@ def test_format_output():
 
     with pytest.raises(ValueError):
         second_func()
+
+def test_instance_add():
+    class A:
+        pass
+
+    @add_instance_method(A)
+    def bar():
+        return "Hello again!"
+
+    assert A().bar() == "Hello again!"
+
+def test_class_add():
+    class A:
+        pass
+
+    @add_class_method(A)
+    def foo():
+        return "Hello!"
+
+    assert A.foo() == "Hello!"
