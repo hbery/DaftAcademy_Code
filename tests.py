@@ -7,6 +7,8 @@ from datetime import date, timedelta
 from main import app
 from models import Person, RegisteredPerson
 from util import calculate_names_length
+from decorators import greetings, is_palindrome, format_output
+
 
 client = TestClient(app)
 client.counter = 0
@@ -82,3 +84,43 @@ def test_getting_patients_nf(pat_id):
 def test_getting_patients_br(pat_id):
     response = client.get(f'/patient/{pat_id}')
     assert response.status_code == 400
+
+
+def test_greetings_decorator():
+
+    @greetings
+    def to_test():
+        return 'jan nowak'
+
+    assert to_test() == 'Hello Jan Nowak'
+
+def test_is_palindrome():
+    
+    @is_palindrome
+    def to_test():
+        return 'an, Na'
+
+    assert to_test() == 'an, Na - is palindrome'
+
+def test_format_output():
+
+    @format_output("first_name__last_name", "city")
+    def first_func():
+        return {
+            "first_name": "Jan",
+            "last_name": "Kowalski",
+            "city": "Warszawa",
+        }
+
+    @format_output("first_name", "age")
+    def second_func():
+        return {
+            "first_name": "Jan",
+            "last_name": "Kowalski",
+            "city": "Warszawa",
+        }
+
+    assert first_func() == {"first_name__last_name": "Jan Kowalski", "city": "Warszawa"}
+
+    with pytest.raises(ValueError):
+        second_func()
