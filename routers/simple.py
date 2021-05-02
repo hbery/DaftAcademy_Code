@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Response, status
 
-from models import HelloResp, Person, RegisteredPerson
+from models import Message, Person, RegisteredPerson
 from util import calculate_names_length
 
 from hashlib import sha512
@@ -26,9 +26,9 @@ def counter():
     s_router.counter += 1
     return s_router.counter
 
-@s_router.get("/hello/{name}", response_model=HelloResp)
+@s_router.get("/hello/{name}", response_model=Message)
 async def hello_name_view(name: str):
-    return HelloResp(msg=f"Hello {name}")
+    return Message(message=f"Hello {name}")
 
 @s_router.get('/auth')
 async def authorize(response: Response, password: str = '', password_hash: str = ''):

@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from datetime import date
 
-class HelloResp(BaseModel):
-	msg: str
+class Message(BaseModel):
+	message: str
 
 class Person(BaseModel):
 	name: str

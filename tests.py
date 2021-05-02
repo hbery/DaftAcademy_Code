@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 import pytest
 import json
 import base64
+import requests
 from datetime import date, timedelta
 from collections import namedtuple
 
@@ -24,17 +25,17 @@ def test_read_main():
 def test_hello_name(name):
     response = client.get(f"/hello/{name}")
     assert response.status_code == 200
-    assert response.json() == {"msg": f"Hello {name}"}
+    assert response.json() == {"message": f"Hello {name}"}
 
-# def test_counter():
-#     response = client.get(f"/counter")
-#     assert response.status_code == 200
-#     assert response.text == "1"
+def test_counter():
+    response = client.get(f"/counter")
+    assert response.status_code == 200
+    assert response.text == "1"
     
-#     # 2nd Try
-#     response = client.get(f"/counter")
-#     assert response.status_code == 200
-#     assert response.text == "2"
+    # 2nd Try
+    response = client.get(f"/counter")
+    assert response.status_code == 200
+    assert response.text == "2"
 
 # check '/method' endpoint
 @pytest.mark.parametrize("method", ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE'])
@@ -192,3 +193,70 @@ def test_token_login_ok(input: dict):
     else:
         assert response.status_code == 201
         assert 'token' in response.json()
+
+@pytest.mark.parametrize("fmt", ["", "json", "html"])
+def test_welcome_session_ok(fmt: str):
+    log = client.post('/login_session', auth=("4dm1n", "NotSoSecurePa$$"))
+    response = client.get(f'/welcome_session?format={fmt}', cookies=log.cookies)
+
+    assert response.status_code == 200
+
+    if fmt == "html":
+        assert response.headers["content-type"].split(';')[0] == "text/html"
+        assert response.text.__contains__('<h1>Welcome!</h1>')
+    elif fmt == "json":
+        assert response.headers["content-type"].split(';')[0] == "application/json"
+        assert response.json() == {"message": "Welcome!"}
+    else:
+        assert response.headers["content-type"].split(';')[0] == "text/plain"
+        assert response.text == "Welcome!"
+
+@pytest.mark.parametrize("fail", [None, "empty", "wrong"])
+def test_welcome_session_fail(fail: str):
+    log = client.post('/login_session', auth=("4dm1n", "NotSoSecurePa$$"))
+
+    if fail == 'wrong':
+        log.cookies['session_token'] = log.cookies['session_token'][::-1]
+    elif fail == "empty":
+        log.cookies['session_token'] = ""
+
+    assert "session_token" in log.cookies.keys()
+
+    response=None
+    if fail == None:
+        del log.cookies
+        response = client.get('/welcome_session', cookies=None)
+    else:
+        response = client.get('/welcome_session', cookies=log.cookies)
+
+    assert response.status_code == 401
+
+@pytest.mark.parametrize("fmt", ["", "json", "html"])
+def test_welcome_token_ok(fmt: str):
+    log = client.post('/login_token', auth=("4dm1n", "NotSoSecurePa$$"))
+    response = client.get(f'/welcome_token?token={log.json()["token"]}&format={fmt}')
+
+    assert response.status_code == 200
+
+    if fmt == "html":
+        assert response.headers["content-type"].split(';')[0] == "text/html"
+        assert response.text.__contains__('<h1>Welcome!</h1>')
+    elif fmt == "json":
+        assert response.headers["content-type"].split(';')[0] == "application/json"
+        assert response.json() == {"message": "Welcome!"}
+    else:
+        assert response.headers["content-type"].split(';')[0] == "text/plain"
+        assert response.text == "Welcome!"
+
+@pytest.mark.parametrize("fail", [None, "empty", "wrong"])
+def test_welcome_token_fail(fail: str):
+    token = ""
+
+    if fail == "wrong":
+        token = "xd"
+    elif fail == None:
+        response = client.get(f'/welcome_token')
+
+    response = client.get(f'/welcome_token?token={token}')
+
+    assert response.status_code == 401
