@@ -144,3 +144,11 @@ def test_class_add():
         return "Hello!"
 
     assert A.foo() == "Hello!"
+
+def test_hello_html():
+    response = client.get("/hello")
+
+    today = date.today()
+
+    assert response.headers["content-type"].split(';')[0] == "text/html"
+    assert response.text.__contains__(f'<h1>Hello! Today date is {today.strftime("%Y-%m-%d")}</h1>')
