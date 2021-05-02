@@ -1,6 +1,6 @@
 import re
 import hashlib
-from datetime import datetime
+from time import time_ns
 from secrets import compare_digest
 
 from fastapi import HTTPException, status, Depends
@@ -28,7 +28,7 @@ def check_credentials(credentials: HTTPBasicCredentials = Depends(auth)) -> str:
 			headers={"WWW-Authenticate": "Basic"},
 		)
 
-	return hashlib.sha512(f"{credentials.password}::{credentials.username}-{datetime.now().ctime()}".encode('utf-8')).hexdigest()
+	return hashlib.sha512(f"{credentials.password}::{credentials.username}-{time_ns()}".encode('utf-8')).hexdigest()
 
 
 if __name__ == "__main__":

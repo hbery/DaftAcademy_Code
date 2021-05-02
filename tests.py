@@ -227,8 +227,6 @@ def test_welcome_session_fail(fail: str):
 
     response = client.get('/welcome_session', cookies=log.cookies)
 
-    print(response.cookies.get_dict())
-
     assert response.status_code == 401
 
 @pytest.mark.parametrize("fmt", ["", "json", "html"])
@@ -260,3 +258,54 @@ def test_welcome_token_fail(fail: str):
     response = client.get(f'/welcome_token?token={token}')
 
     assert response.status_code == 401
+
+def test_redirect_session():
+    log = client.post('/login_session', auth=("4dm1n", "NotSoSecurePa$$"))
+    resp_del = client.delete('/logout_session', allow_redirects=False)
+
+    assert resp_del.status_code == 302
+    assert resp_del.headers['location']
+
+    resp_red = client.get(resp_del.headers['location'])
+
+    assert resp_red.status_code == 200
+
+    resp_wel = client.get('/welcome_session', cookies=log.cookies)
+
+    assert resp_wel.status_code == 401
+
+def test_redirect_token():
+    log = client.post('/login_token', auth=("4dm1n", "NotSoSecurePa$$"))
+    resp_del = client.delete(f'/logout_token?token={log.json()["token"]}', allow_redirects=False)
+
+    assert resp_del.status_code == 302
+    assert resp_del.headers['location']
+
+    resp_red = client.get(resp_del.headers['location'])
+
+    assert resp_red.status_code == 200
+
+    resp_wel = client.get(f'/welcome_token?token={log.json()["token"]}')
+
+    assert resp_wel.status_code == 401
+
+def test_mutliclient_session():
+    log1 = client.post('/login_session', auth=("4dm1n", "NotSoSecurePa$$"))
+    log2 = client.post('/login_session', auth=("4dm1n", "NotSoSecurePa$$"))
+    log3 = client.post('/login_session', auth=("4dm1n", "NotSoSecurePa$$"))
+    log4 = client.post('/login_session', auth=("4dm1n", "NotSoSecurePa$$"))
+
+    client.cookies.clear()
+    resp_wel1 = client.get('/welcome_session', cookies=log1.cookies)
+
+    assert resp_wel1.status_code == 401
+
+def test_multiclient_token():
+    log1 = client.post('/login_token', auth=("4dm1n", "NotSoSecurePa$$"))
+    log2 = client.post('/login_token', auth=("4dm1n", "NotSoSecurePa$$"))
+    log3 = client.post('/login_token', auth=("4dm1n", "NotSoSecurePa$$"))
+    log4 = client.post('/login_token', auth=("4dm1n", "NotSoSecurePa$$"))
+
+    resp_wel1 = client.get(f'/welcome_token?token={log1.json()["token"]}')
+
+    assert resp_wel1.status_code == 401
