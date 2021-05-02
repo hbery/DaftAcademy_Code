@@ -104,13 +104,26 @@ def welcome_token(request: Request, token: str = "", format: str = ""):
 
 @m_router.delete('/logout_session', status_code=status.HTTP_302_FOUND)
 def logout_session(request: Request, format: str = ""):
-	if ("session_token" not in request.cookies.keys()) or (request.cookies["session_token"] is None) or (request.cookies["session_token"] != m_router.session):
+	if ("session_token" not in request.cookies.keys()):
 		raise HTTPException(
 			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Not authorized"
+			# detail="Not authorized"
+			detail="I went to no keys"
+		)
+	if (request.cookies["session_token"] is None):
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			# detail="Not authorized"
+			detail="Session_token is None"
+		)
+	if (request.cookies["session_token"] != m_router.session):
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			# detail="Not authorized"
+			detail="Tokens dont match"
 		)
 
-	m_router.session_token = None
+	m_router.session = None
 
 	return RedirectResponse(url=f"/logged_out?format={format}", status_code=302)
 
