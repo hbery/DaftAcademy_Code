@@ -5,11 +5,14 @@ from datetime import date
 from fastapi import APIRouter, Request, Response, status, Depends, Query, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
+from fastapi_route_log.log_request import LoggingRoute
 
 from models import Token, Message
 from util import check_credentials
 
 m_router = APIRouter()
+# m_router.route_class = LoggingRoute
+
 m_router.token = None
 m_router.session = None
 
@@ -126,6 +129,7 @@ def logout_token(request: Request, token: str = "", format: str = ""):
 
 @m_router.api_route('/logged_out', status_code=status.HTTP_200_OK, methods=['GET', 'DELETE'])
 def logged_out(request: Request, format: str = ""):
+	print(request.headers)
 
 	if format == 'json':
 		return Message(
