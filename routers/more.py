@@ -10,8 +10,8 @@ from models import Token, Message
 from util import check_credentials
 
 m_router = APIRouter()
-m_router.token = ""
-m_router.session = ""
+m_router.token = None
+m_router.session = None
 
 templates = Jinja2Templates(directory="templates")
 
@@ -95,7 +95,7 @@ def logout_session(request: Request, format: str = ""):
 			detail="Not authorized"
 		)
 
-	m_router.session_token = ""
+	m_router.session_token = None
 
 	return RedirectResponse(url=f"/logged_out?format={format}", status_code=302)
 
@@ -107,13 +107,15 @@ def logout_token(request: Request, token: str = "", format: str = ""):
 			detail="Not authorized"
 		)
 
-	m_router.token = ""
+	m_router.token = None
 
 	return RedirectResponse(url=f"/logged_out?format={format}", status_code=302)
 
 
 @m_router.api_route('/logged_out', status_code=status.HTTP_200_OK, methods=['GET', 'DELETE'])
 def logged_out(request: Request, format: str = ""):
+	if 
+
 
 	if format == 'json':
 		return Message(
