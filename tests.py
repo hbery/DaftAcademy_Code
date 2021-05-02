@@ -2,7 +2,9 @@ from fastapi.testclient import TestClient
 
 import pytest
 import json
+import base64
 from datetime import date, timedelta
+from collections import namedtuple
 
 from main import app
 from models import Person, RegisteredPerson
@@ -54,7 +56,7 @@ def test_password_fail():
     response = client.get("/auth?password=haslo&password_hash=f34ad4b3ae1e2cf33092e2abb60dc0444781c15d0e2e9ecdb37e4b14176a0164027b05900e09fa0f61a1882e0b89fbfa5dcfcc9765dd2ca4377e2c794837e091")
     assert response.status_code == 401
 
-remember_ans = {}
+remember_answers = {}
 
 @pytest.mark.parametrize("new_user", [Person(name='Jan', surname='Kowalski'), Person(name='Anna', surname='Nowak'), Person(name='Anna', surname='Nowak-Jurczyńska')])
 def test_registartion(new_user: Person):
@@ -66,14 +68,14 @@ def test_registartion(new_user: Person):
     assert response.json()['register_date'] == date.today().strftime(format="%Y-%m-%d")
     vac_date = date.today() + timedelta(days=calculate_names_length(new_user.name, new_user.surname))
     assert response.json()['vaccination_date'] == vac_date.strftime(format="%Y-%m-%d")
-    remember_ans[response.json()['id']] = response.json()
+    remember_answers[response.json()['id']] = response.json()
 
 
-@pytest.mark.parametrize("pat_id", remember_ans.keys())
+@pytest.mark.parametrize("pat_id", remember_answers.keys())
 def test_getting_patients_ok(pat_id):
     response = client.get(f'/patient/{pat_id}')
     assert response.status_code == 200
-    assert response.json() == remember_ans[pat_id]
+    assert response.json() == remember_answers[pat_id]
 
 @pytest.mark.parametrize("pat_id", [400, 500])
 def test_getting_patients_nf(pat_id):
@@ -152,3 +154,41 @@ def test_hello_html():
 
     assert response.headers["content-type"].split(';')[0] == "text/html"
     assert response.text.__contains__(f'<h1>Hello! Today date is {today.strftime("%Y-%m-%d")}</h1>')
+
+Credentials = namedtuple("Credentials", ("username", "password"))
+
+@pytest.mark.parametrize("input", [
+    {'creds': Credentials(username="4dm1n", password="NotSoSecurePa$$"), 'status': 'ok'},
+    {'creds': Credentials(username="4dm1n", password="notsosecurePa$$"), 'status': 'fail'},
+    {'creds': Credentials(username="admin", password="NotSoSecurePa$$"), 'status': 'fail'}
+    ]
+)
+def test_session_login_ok(input: dict):
+    response = client.post(
+        "/login_session", 
+        auth=(input['creds'].username, input['creds'].password)
+    )
+
+    if input['status'] == 'fail':
+        assert response.status_code == 401
+    else:
+        assert response.status_code == 201
+        assert 'session_token' in response.cookies
+
+@pytest.mark.parametrize("input", [
+    {'creds': Credentials(username="4dm1n", password="NotSoSecurePa$$"), 'status': 'ok'},
+    {'creds': Credentials(username="4dm1n", password="notsosecurePa$$"), 'status': 'fail'},
+    {'creds': Credentials(username="admin", password="NotSoSecurePa$$"), 'status': 'fail'}
+    ]
+)
+def test_token_login_ok(input: dict):
+    response = client.post(
+        "/login_token", 
+        auth=(input['creds'].username, input['creds'].password)
+    )
+
+    if input['status'] == 'fail':
+        assert response.status_code == 401
+    else:
+        assert response.status_code == 201
+        assert 'token' in response.json()

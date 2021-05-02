@@ -14,3 +14,6 @@ class RegisteredPerson(BaseModel):
 	surname: str
 	register_date: str
 	vaccination_date: str
+
+class Token(BaseModel):
+	token: str
