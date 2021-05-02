@@ -211,7 +211,12 @@ def test_welcome_session_ok(fmt: str):
         assert response.headers["content-type"].split(';')[0] == "text/plain"
         assert response.text == "Welcome!"
 
-@pytest.mark.parametrize("fail", [None, "empty", "wrong"])
+def test_welcome_session_none():
+    client.cookies.clear()
+    response = client.get('/welcome_session')
+    assert response.status_code == 401
+
+@pytest.mark.parametrize("fail", ["empty", "wrong"])
 def test_welcome_session_fail(fail: str):
     log = client.post('/login_session', auth=("4dm1n", "NotSoSecurePa$$"))
 
@@ -220,14 +225,9 @@ def test_welcome_session_fail(fail: str):
     elif fail == "empty":
         log.cookies['session_token'] = ""
 
-    assert "session_token" in log.cookies.keys()
+    response = client.get('/welcome_session', cookies=log.cookies)
 
-    response=None
-    if fail == None:
-        del log.cookies
-        response = client.get('/welcome_session', cookies=None)
-    else:
-        response = client.get('/welcome_session', cookies=log.cookies)
+    print(response.cookies.get_dict())
 
     assert response.status_code == 401
 

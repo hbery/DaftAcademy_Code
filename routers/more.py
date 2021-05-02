@@ -41,11 +41,23 @@ def login_token(token: str = Depends(check_credentials)):
 
 @m_router.get("/welcome_session")
 def welcome_session(request: Request, format: str = ""):
-	if ("session_token" not in request.cookies.keys()) or (request.cookies["session_token"] == "") or (request.cookies["session_token"] != m_router.session):
-		
+	if ("session_token" not in request.cookies.keys()):
 		raise HTTPException(
 			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="Not authorized"
+			# detail="Not authorized"
+			detail="I went to no keys"
+		)
+	if (request.cookies["session_token"] is None):
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			# detail="Not authorized"
+			detail="Session_token is None"
+		)
+	if (request.cookies["session_token"] != m_router.session):
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			# detail="Not authorized"
+			detail="Tokens dont match"
 		)
 
 	if format == 'json':
@@ -89,7 +101,7 @@ def welcome_token(request: Request, token: str = "", format: str = ""):
 
 @m_router.delete('/logout_session', status_code=status.HTTP_302_FOUND)
 def logout_session(request: Request, format: str = ""):
-	if ("session_token" not in request.cookies.keys()) or (request.cookies["session_token"] == "") or (request.cookies["session_token"] != m_router.session):
+	if ("session_token" not in request.cookies.keys()) or (request.cookies["session_token"] is None) or (request.cookies["session_token"] != m_router.session):
 		raise HTTPException(
 			status_code=status.HTTP_401_UNAUTHORIZED,
 			detail="Not authorized"
@@ -114,8 +126,6 @@ def logout_token(request: Request, token: str = "", format: str = ""):
 
 @m_router.api_route('/logged_out', status_code=status.HTTP_200_OK, methods=['GET', 'DELETE'])
 def logged_out(request: Request, format: str = ""):
-	if 
-
 
 	if format == 'json':
 		return Message(
