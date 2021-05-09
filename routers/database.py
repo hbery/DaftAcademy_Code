@@ -136,3 +136,36 @@ async def get_products_ext():
     ).fetchall()
     
     return dict(products_extended=data)
+
+@d_router.get('/products/{pid}/orders')
+async def get_product_orders(pid: int):
+    if not isinstance(pid, int):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Record identified by given id: {pid} does not exist."
+        )
+    
+    cursor = d_router.dbconn.cursor()
+    cursor.row_factory = sqlite3.Row
+    
+    data = cursor.execute("""
+                        SELECT 
+                            od.OrderID AS id, 
+                            (select c.CompanyName from Customers as c where c.CustomerID = o.CustomerID ) AS customer, 
+                            od.Quantity AS quantity, 
+                            ((od.UnitPrice * od.Quantity) - (od.Discount * (od.Quantity * od.UnitPrice))) AS total_price 
+                        FROM 'Order Details' AS od 
+                        JOIN orders AS o ON o.OrderID = od.OrderID 
+                        JOIN Products AS p ON od.ProductID = p.ProductID 
+                        WHERE od.ProductID = :pid;
+                        """,
+                          {"pid": pid}
+    ).fetchall()
+    
+    if data:
+        return dict(orders=data)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Record identified by given id: {pid} does not exist."
+        )
