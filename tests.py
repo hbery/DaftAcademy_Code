@@ -11,6 +11,7 @@ from main import app
 from models import Person, RegisteredPerson
 from util import calculate_names_length
 from decorators import greetings, is_palindrome, format_output, add_instance_method, add_class_method
+from twisted.test.test_sip import response_multiline
 
 
 client = TestClient(app)
@@ -309,3 +310,19 @@ def test_multiclient_token():
     resp_wel1 = client.get(f'/welcome_token?token={log1.json()["token"]}')
 
     assert resp_wel1.status_code == 401
+    
+def test_categories():
+    response = client.get('/categories')
+    
+    assert response.status_code == 200
+    assert response.json().keys[0] == "categories"
+    assert response.json()["categories"][0].keys() == ["id", "name"]
+    
+    
+def test_customers():
+    response = client.get('/customers')
+    
+    assert response.status_code == 200
+    assert response.json().keys[0] == "customers"
+    assert response.json()["customers"][0].keys() == ["id", "name"]
+    

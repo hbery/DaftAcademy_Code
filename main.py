@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi_route_log.log_request import LoggingRoute
-from routers import simple, more
+from routers import simple, more, database
 
 app = FastAPI()
-app.router.route_class = LoggingRoute
+# app.router.route_class = LoggingRoute
 
 app.include_router(
 	simple.s_router,
@@ -11,6 +11,10 @@ app.include_router(
 )
 app.include_router(
 	more.m_router,
+	tags=["more_endpoints"]
+)
+app.include_router(
+	database.d_router,
 	tags=["more_endpoints"]
 )
 
