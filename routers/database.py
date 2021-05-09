@@ -153,7 +153,7 @@ async def get_product_orders(pid: int):
                             od.OrderID AS id, 
                             (select c.CompanyName from Customers as c where c.CustomerID = o.CustomerID ) AS customer, 
                             od.Quantity AS quantity, 
-                            ((od.UnitPrice * od.Quantity) - (od.Discount * (od.Quantity * od.UnitPrice))) AS total_price 
+                            ROUND(((od.UnitPrice * od.Quantity) - (od.Discount * (od.Quantity * od.UnitPrice))), 2) AS total_price 
                         FROM 'Order Details' AS od 
                         JOIN orders AS o ON o.OrderID = od.OrderID 
                         JOIN Products AS p ON od.ProductID = p.ProductID 
