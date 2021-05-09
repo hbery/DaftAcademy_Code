@@ -54,8 +54,8 @@ async def get_customers():
         
         
         return dict(customers=[{
-            "id": row["id"].strip().replace("  ", " "), 
-            "name": row["name"].strip().replace("  ", " "), 
+            "id": row["id"], 
+            "name": row["name"], 
             "full_address": row["full_address"].strip().replace("  ", " ")}
         for row in data])
     
@@ -120,3 +120,19 @@ async def get_employees(limit: int = 0, offset: int = 0, order: str = ""):
     employees = cursor.execute(query_string).fetchall()
     
     return dict(employees=employees)
+
+@d_router.get('/products_extended', status_code=status.HTTP_200_OK)
+async def get_products_ext():
+    cursor = d_router.dbconn.cursor()
+    cursor.row_factory = sqlite3.Row
+    data = cursor.execute("""
+                        SELECT
+                            ProductID as id,
+                            ProductName as name,
+                            (SELECT c.CategoryName FROM Categories as c WHERE c.CategoryID = CategoryID) as category,
+                            (SELECT s.CompanyName FROM Suppliers as s WHERE s.SupplierID = SupplierID) as supplier
+                        FROM Products
+                        ORDER BY id"""
+    ).fetchall()
+    
+    return dict(products_extended=data)
