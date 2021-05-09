@@ -26,7 +26,7 @@ async def get_categories():
                 CategoryID as id, 
                 CategoryName as name 
             FROM Categories 
-            ORDER BY id"""
+            ORDER BY id;"""
         ).fetchall()
         
         return dict(categories=data)
@@ -48,7 +48,7 @@ async def get_customers():
                 COALESCE(CompanyName, '') as name, 
                 (COALESCE(Address, '') || ' ' || COALESCE(PostalCode, '') || ' ' || COALESCE(City, '') || ' ' || COALESCE(Country, '')) as full_address 
             FROM Customers 
-            ORDER BY id"""
+            ORDER BY UPPER(id);"""
         ).fetchall()
         
         
@@ -99,7 +99,7 @@ async def get_employees(limit: int = 0, offset: int = 0, order: str = ""):
     cursor.row_factory = sqlite3.Row
     
     accept_order = ["last_name", "first_name", "city"]
-    query_string = "SELECT EmployeeID as id, LastName as last_name, FirstName as first_name, City as city FROM Employees"
+    query_string = "SELECT EmployeeID as id, LastName as last_name, FirstName as first_name, City as city FROM Employees;"
     
     if order in accept_order:
         query_string += f" ORDER BY {order}"
@@ -132,7 +132,7 @@ async def get_products_ext():
                             (SELECT c.CategoryName FROM Categories as c WHERE c.CategoryID = p.CategoryID) as category,
                             (SELECT s.CompanyName FROM Suppliers as s WHERE s.SupplierID = p.SupplierID) as supplier
                         FROM Products as p
-                        ORDER BY id"""
+                        ORDER BY id;"""
     ).fetchall()
     
     return dict(products_extended=data)
