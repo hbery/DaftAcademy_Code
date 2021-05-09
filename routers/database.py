@@ -38,12 +38,12 @@ async def get_customers():
     cursor = d_router.dbconn.cursor()
     try:
         data = cursor.execute(
-            "SELECT CustomerID, CompanyName FROM customers ORDER BY CustomerID"
+            "SELECT CustomerID, ContactName FROM customers ORDER BY CustomerID"
             ).fetchall()
         return JSONResponse(
             {
-                # "customers": [{"id": row[0], "name": row[1]} for row in data]
-                "customers": data
+                "customers": [{"id": row[0], "name": row[1]} for row in data]
+                # "customers": data
             }, 
             status_code=status.HTTP_200_OK
         )
