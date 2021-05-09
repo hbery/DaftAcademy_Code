@@ -119,4 +119,4 @@ async def get_employees(limit: int = 0, offset: int = 0, order: str = ""):
 
     employees = cursor.execute(query_string).fetchall()
     
-    return dict(emplyees=employees)
+    return dict(employees=employees)
