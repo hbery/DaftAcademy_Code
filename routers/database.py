@@ -57,15 +57,15 @@ async def get_customers():
             detail=f"{e}"
         )
         
-@d_router.get("/products/{int: id}", status_code=status.HTTP_200_OK)
-async def products(id: int):
-    if not isinstance(id, int):
+@d_router.get("/products/{pid}", status_code=status.HTTP_200_OK)
+async def products(pid: int):
+    if not isinstance(pid, int):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Record identified by given id: {id} does not exist."
+            detail=f"Record identified by given id: {pid} does not exist."
         )
     
-    cursor = d_router.db_conn.cursor()
+    cursor = d_router.dbconn.cursor()
     cursor.row_factory = sqlite3.Row
     
     products = cursor.execute("""
@@ -74,7 +74,7 @@ async def products(id: int):
                                 ProductName as name 
                               FROM Products 
                               WHERE id = :pid""", 
-                              {"pid": id}
+                              {"pid": pid}
     ).fetchone()
     
     if products:
@@ -82,5 +82,5 @@ async def products(id: int):
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Record identified by given id: {id} does not exist."
+            detail=f"Record identified by given id: {pid} does not exist."
         )
