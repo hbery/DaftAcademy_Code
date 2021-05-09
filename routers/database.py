@@ -127,11 +127,11 @@ async def get_products_ext():
     cursor.row_factory = sqlite3.Row
     data = cursor.execute("""
                         SELECT
-                            ProductID as id,
-                            ProductName as name,
-                            (SELECT c.CategoryName FROM Categories as c WHERE c.CategoryID = CategoryID) as category,
-                            (SELECT s.CompanyName FROM Suppliers as s WHERE s.SupplierID = SupplierID) as supplier
-                        FROM Products
+                            p.ProductID as id,
+                            p.ProductName as name,
+                            (SELECT c.CategoryName FROM Categories as c WHERE c.CategoryID = p.CategoryID) as category,
+                            (SELECT s.CompanyName FROM Suppliers as s WHERE s.SupplierID = p.SupplierID) as supplier
+                        FROM Products as p
                         ORDER BY id"""
     ).fetchall()
     
