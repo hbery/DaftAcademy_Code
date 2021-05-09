@@ -1,3 +1,4 @@
+from os import curdir
 import sqlite3
 
 from fastapi import APIRouter, Request, Response, status, HTTPException
@@ -38,13 +39,12 @@ async def get_customers():
     cursor = d_router.dbconn.cursor()
     try:
         data = cursor.execute(
-            "SELECT CustomerID, ContactName FROM customers ORDER BY CustomerID"
+            "SELECT CustomerID, CompanyName, (COALESCE(Address, '') || ' ' || COALESCE(PostalCode, '') || ' ' || COALESCE(City, '') || ' ' || COALESCE(Country, '')) FROM customers ORDER BY CustomerID"
             ).fetchall()
         return JSONResponse(
             {
-                "customers": [{"id": row[0], "name": row[1]} for row in data]
-                # "customers": data
-            }, 
+                "customers": [{"id": row[0], "name": row[1], "full_address": row[2]} for row in data]
+            },
             status_code=status.HTTP_200_OK
         )
     except Exception as e:
@@ -52,3 +52,12 @@ async def get_customers():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
             detail=f"{e}"
         )
+        
+@d_router.get("/products/{int: id}")
+async def products():
+    cursor = d_router.db_connection.cursor()
+    products = cursor.execute("SELECT ProductName FROM Products").fetchall()
+    return {
+        "products": products,
+        "products_counter": len(products)
+    }
