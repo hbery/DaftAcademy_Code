@@ -42,7 +42,8 @@ async def get_customers():
             ).fetchall()
         return JSONResponse(
             {
-                "customers": [{"id": row[0], "name": row[1]} for row in data]
+                # "customers": [{"id": row[0], "name": row[1]} for row in data]
+                "customers": data
             }, 
             status_code=status.HTTP_200_OK
         )
