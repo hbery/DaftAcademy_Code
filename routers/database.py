@@ -221,7 +221,7 @@ async def upadate_category(cid: int, new_category: NewCategory):
     ).fetchone()
     
     if data:
-        return dict(id=data["id"], name=data["name"])
+        return dict(id=data["id"], name=new_category.name)
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
