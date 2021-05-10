@@ -1,12 +1,11 @@
-from hmac import new
-import re
 from models import NewCategory
-from os import stat
 import sqlite3
-from typing import OrderedDict
 
-from fastapi import APIRouter, Request, Response, status, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import (
+    APIRouter, 
+    status, 
+    HTTPException
+)
 
 from models import NewCategory
 
@@ -56,13 +55,12 @@ async def get_customers():
             ORDER BY UPPER(id);"""
         ).fetchall()
         
-        
-        
-        return dict(customers=[{
-            "id": row["id"], 
-            "name": row["name"], 
-            "full_address": row["full_address"].strip().replace("  ", " ")}
-        for row in data])
+        # return dict(customers=[{
+        #     "id": row["id"], 
+        #     "name": row["name"], 
+        #     "full_address": row["full_address"].strip().replace("  ", " ")}
+        # for row in data])
+        return dict(customers=data)
     
     except Exception as e:
         raise HTTPException(
