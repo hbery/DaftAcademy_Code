@@ -1,9 +1,14 @@
+from hmac import new
+import re
+from models import NewCategory
 from os import stat
 import sqlite3
 from typing import OrderedDict
 
 from fastapi import APIRouter, Request, Response, status, HTTPException
 from fastapi.responses import JSONResponse
+
+from models import NewCategory
 
 d_router = APIRouter()
 
@@ -23,8 +28,8 @@ async def get_categories():
     try:
         data = cursor.execute(
             """SELECT 
-                CategoryID as id, 
-                CategoryName as name 
+                CategoryID AS id, 
+                CategoryName As name 
             FROM Categories 
             ORDER BY id;"""
         ).fetchall()
@@ -44,9 +49,9 @@ async def get_customers():
     try:
         data = cursor.execute(
             """SELECT 
-                CustomerID as id, 
-                COALESCE(CompanyName, '') as name, 
-                (COALESCE(Address, '') || ' ' || COALESCE(PostalCode, '') || ' ' || COALESCE(City, '') || ' ' || COALESCE(Country, '')) as full_address 
+                CustomerID AS id, 
+                COALESCE(CompanyName, '') AS name, 
+                (COALESCE(Address, '') || ' ' || COALESCE(PostalCode, '') || ' ' || COALESCE(City, '') || ' ' || COALESCE(Country, '')) AS full_address 
             FROM Customers 
             ORDER BY UPPER(id);"""
         ).fetchall()
@@ -70,7 +75,7 @@ async def select_product(pid: int):
     if not isinstance(pid, int):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Record identified by given id: {pid} does not exist."
+            detail=f"Record identified by given id: {pid} does not exist in Products table."
         )
     
     cursor = d_router.dbconn.cursor()
@@ -90,7 +95,7 @@ async def select_product(pid: int):
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Record identified by given id: {pid} does not exist."
+            detail=f"Record identified by given id: {pid} does not exist in Products table."
         )
         
 @d_router.get("/employees", status_code=status.HTTP_200_OK)
@@ -142,7 +147,7 @@ async def get_product_orders(pid: int):
     if not isinstance(pid, int):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Record identified by given id: {pid} does not exist."
+            detail=f"Record identified by given id: {pid} does not exist in Products table."
         )
     
     cursor = d_router.dbconn.cursor()
@@ -167,5 +172,95 @@ async def get_product_orders(pid: int):
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Record identified by given id: {pid} does not exist."
+            detail=f"Record identified by given id: {pid} does not exist in Products table."
+        )
+        
+@d_router.post('/categories', status_code=status.HTTP_201_CREATED)
+async def create_new_category(new_category: NewCategory):
+    cursor = d_router.dbconn.cursor()
+    cursor.row_factory = sqlite3.Row
+    
+    data = cursor.execute("""
+                        INSERT INTO Categories
+                            (CategoryName)
+                        VALUES 
+                            (:name)
+                        """,
+                        {"name": new_category.name}
+    )
+    d_router.dbconn.commit()
+    
+    return dict(id=data.lastrowid, name=new_category.name)
+    
+@d_router.put("/categories/{cid}", status_code=status.HTTP_200_OK)
+async def upadate_category(cid: int, new_category: NewCategory):
+    if not isinstance(cid, int):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Record identified by given id: {cid} does not exist in Categories table."
+        )
+        
+    cursor = d_router.dbconn.cursor()
+    cursor.row_factory = sqlite3.Row
+    
+    cursor.execute("""
+                   UPDATE Categories SET CategoryName = :new_name WHERE CategoryID = :id
+                   """,
+                   {"new_name": new_category.name, "id": cid}
+    )
+    d_router.dbconn.commit()
+    
+    data = cursor.execute("""
+                        SELECT
+                            CategoryID AS id,
+                            CategoryName AS name
+                        FROM Categories
+                        WHERE id = :id
+                        """,
+                        {"id": cid}
+    ).fetchone()
+    
+    if data:
+        return dict(id=data["id"], name=data["name"])
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Record identified by given id: {cid} does not exist in Categories table."
+        )
+        
+@d_router.delete('/categories/{cid}', status_code=status.HTTP_200_OK)
+async def delete_category(cid: int):
+    if not isinstance(cid, int):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Record identified by given id: {cid} does not exist in Categories table."
+        )
+        
+    cursor = d_router.dbconn.cursor()
+    cursor.row_factory = sqlite3.Row
+    
+    check = cursor.execute("""
+                        SELECT
+                            CategoryID AS id,
+                            CategoryName AS name
+                        FROM Categories
+                        WHERE id = :id
+                          """,
+                          {"id": cid}
+    ).fetchone()
+    
+    if check:
+        data = cursor.execute("""
+                            DELETE FROM Categories 
+                            WHERE CategoryID = :id
+                                """,
+                            {"id": cid}        
+        )
+        d_router.dbconn.commit()
+        
+        return dict(deleted=data.rowcount)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Record identified by given id: {cid} does not exist in Categories table."
         )

@@ -17,3 +17,6 @@ class RegisteredPerson(BaseModel):
 
 class Token(BaseModel):
 	token: str
+ 
+class NewCategory(BaseModel):
+    name: str
