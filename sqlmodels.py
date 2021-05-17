@@ -1,23 +1,14 @@
-from sqlalchemy import (
-    Column,
-    Date,
-    Float,
-    Integer,
-    LargeBinary,
-    SmallInteger,
-    String,
-    Table,
-    Text,
-)
-from sqlalchemy.ext.declarative import declarative_base
+# coding: utf-8
+from sqlalchemy import Column, Date, Float, Integer, LargeBinary, SmallInteger, String, Table, Text
 from sqlalchemy.sql.sqltypes import NullType
+from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 metadata = Base.metadata
 
 
 class Category(Base):
-    __tablename__ = "categories"
+    __tablename__ = 'categories'
 
     CategoryID = Column(SmallInteger, primary_key=True)
     CategoryName = Column(String(15), nullable=False)
@@ -26,21 +17,21 @@ class Category(Base):
 
 
 class Customercustomerdemo(Base):
-    __tablename__ = "customercustomerdemo"
+    __tablename__ = 'customercustomerdemo'
 
     CustomerID = Column(NullType, primary_key=True, nullable=False)
     CustomerTypeID = Column(NullType, primary_key=True, nullable=False)
 
 
 class Customerdemographic(Base):
-    __tablename__ = "customerdemographics"
+    __tablename__ = 'customerdemographics'
 
     CustomerTypeID = Column(NullType, primary_key=True)
     CustomerDesc = Column(Text)
 
 
 class Customer(Base):
-    __tablename__ = "customers"
+    __tablename__ = 'customers'
 
     CustomerID = Column(NullType, primary_key=True)
     CompanyName = Column(String(40), nullable=False)
@@ -56,7 +47,7 @@ class Customer(Base):
 
 
 class Employee(Base):
-    __tablename__ = "employees"
+    __tablename__ = 'employees'
 
     EmployeeID = Column(SmallInteger, primary_key=True)
     LastName = Column(String(20), nullable=False)
@@ -79,14 +70,14 @@ class Employee(Base):
 
 
 class Employeeterritory(Base):
-    __tablename__ = "employeeterritories"
+    __tablename__ = 'employeeterritories'
 
     EmployeeID = Column(SmallInteger, primary_key=True, nullable=False)
     TerritoryID = Column(String(20), primary_key=True, nullable=False)
 
 
 class OrderDetail(Base):
-    __tablename__ = "order_details"
+    __tablename__ = 'order_details'
 
     OrderID = Column(SmallInteger, primary_key=True, nullable=False)
     ProductID = Column(SmallInteger, primary_key=True, nullable=False)
@@ -96,7 +87,7 @@ class OrderDetail(Base):
 
 
 class Order(Base):
-    __tablename__ = "orders"
+    __tablename__ = 'orders'
 
     OrderID = Column(SmallInteger, primary_key=True)
     CustomerID = Column(NullType)
@@ -115,7 +106,7 @@ class Order(Base):
 
 
 class Product(Base):
-    __tablename__ = "products"
+    __tablename__ = 'products'
 
     ProductID = Column(SmallInteger, primary_key=True)
     ProductName = Column(String(40), nullable=False)
@@ -130,14 +121,14 @@ class Product(Base):
 
 
 class Region(Base):
-    __tablename__ = "region"
+    __tablename__ = 'region'
 
     RegionID = Column(SmallInteger, primary_key=True)
     RegionDescription = Column(NullType, nullable=False)
 
 
 class Shipper(Base):
-    __tablename__ = "shippers"
+    __tablename__ = 'shippers'
 
     ShipperID = Column(SmallInteger, primary_key=True)
     CompanyName = Column(String(40), nullable=False)
@@ -145,7 +136,7 @@ class Shipper(Base):
 
 
 class ShippersTmp(Base):
-    __tablename__ = "shippers_tmp"
+    __tablename__ = 'shippers_tmp'
 
     ShipperID = Column(SmallInteger, primary_key=True)
     CompanyName = Column(String(40), nullable=False)
@@ -153,7 +144,7 @@ class ShippersTmp(Base):
 
 
 class Supplier(Base):
-    __tablename__ = "suppliers"
+    __tablename__ = 'suppliers'
 
     SupplierID = Column(SmallInteger, primary_key=True)
     CompanyName = Column(String(40), nullable=False)
@@ -170,8 +161,17 @@ class Supplier(Base):
 
 
 class Territory(Base):
-    __tablename__ = "territories"
+    __tablename__ = 'territories'
 
     TerritoryID = Column(String(20), primary_key=True)
     TerritoryDescription = Column(NullType, nullable=False)
     RegionID = Column(SmallInteger, nullable=False)
+
+
+t_usstates = Table(
+    'usstates', metadata,
+    Column('StateID', SmallInteger, nullable=False),
+    Column('StateName', String(100)),
+    Column('StateAbbr', String(2)),
+    Column('StateRegion', String(50))
+)

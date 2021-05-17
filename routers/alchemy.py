@@ -10,8 +10,17 @@ from fastapi import (
     Depends
 )
 
-from sqlmodels import Supplier
-from models import SupplierSmall
+from sqlmodels import (
+    Category, 
+    Supplier, 
+    Product
+)
+from models import (
+    SupplierProduct, 
+    SupplierSmall, 
+    SupplierProduct,
+    CategoryData
+)
 
 SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
 
@@ -50,3 +59,36 @@ async def get_supplier_by_id(supplier_id: int = None, db: Session = Depends(get_
         )
     
     return supplier
+
+@a_router.get("/suppliers/{supplier_id}/products", status_code=status.HTTP_200_OK)
+async def get_products_by_supplier(supplier_id: int = None, db: Session = Depends(get_database)):
+    if not supplier_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Id not found"
+        )
+    
+    products = ( db.query(Product, Category)
+        .filter(Product.CategoryID == Category.CategoryID)
+        .filter(Product.SupplierID == supplier_id)
+        .order_by(Product.ProductID.desc())
+        .all()
+    )
+    
+    if not products:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Id not found"
+        )
+      
+    return list(
+        [ SupplierProduct(
+            ProductID=row.Product.ProductID, 
+            ProductName=row.Product.ProductName, 
+            Category=CategoryData(
+                CategoryID=row.Category.CategoryID,
+                CategoryName=row.Category.CategoryName
+            ),
+            Discontinued=row.Product.Discontinued
+            ) for row in products]
+    )

@@ -19,11 +19,27 @@ class Token(BaseModel):
 	token: str
  
 class NewCategory(BaseModel):
-    name: str
-    
+	name: str
+
 class SupplierSmall(BaseModel):
-    SupplierID: PositiveInt
-    CompanyName: str
-    
-    class Config:
-        orm_mode = True
+	SupplierID: PositiveInt
+	CompanyName: str
+
+	class Config:
+		orm_mode = True
+
+class CategoryData(BaseModel):
+	CategoryID: PositiveInt
+	CategoryName: str  
+
+	class Config:
+		orm_mode = True
+
+class SupplierProduct(BaseModel):
+	ProductID: PositiveInt
+	ProductName: str
+	Category: CategoryData
+	Discontinued: int
+
+	class Config:
+		orm_mode = True
