@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi_route_log.log_request import LoggingRoute
-from routers import simple, more, database
+from routers import simple, more, database, alchemy
 
 app = FastAPI()
 # app.router.route_class = LoggingRoute
@@ -15,7 +15,12 @@ app.include_router(
 )
 app.include_router(
 	database.d_router,
-	tags=["more_endpoints"]
+	tags=["sqlite_endpoints"]
+)
+
+app.include_router(
+	alchemy.a_router,
+ 	tags=["postgres_endpoints"]
 )
 
 @app.get("/")

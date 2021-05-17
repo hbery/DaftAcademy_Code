@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from datetime import date
+from pydantic import BaseModel, PositiveInt
+from pydantic.fields import T
 
 class Message(BaseModel):
 	message: str
@@ -20,3 +20,10 @@ class Token(BaseModel):
  
 class NewCategory(BaseModel):
     name: str
+    
+class SupplierSmall(BaseModel):
+    SupplierID: PositiveInt
+    CompanyName: str
+    
+    class Config:
+        orm_mode = True
