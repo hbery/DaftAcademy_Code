@@ -128,18 +128,13 @@ async def update_supplier(supplier_id: int, usupp: UpdateSupplier, db: Session =
             detail="Id not found"
         )
         
-    # try:
-    #     to_update.update(**usupp.dict())
-    # except Exception as e:
-    #     print(str(e))        
-    
     updict = {k: v for k, v in usupp.dict().items() if v is not None}
-    
-    is_updated = ( db.query(Supplier)
-                    .filter(Supplier.SupplierID == supplier_id)
-                    .update(updict, synchronize_session="fetch")
-                )
-    # db.update(to_update)
+    if updict:
+        is_updated = ( db.query(Supplier)
+                        .filter(Supplier.SupplierID == supplier_id)
+                        .update(updict, synchronize_session="fetch")
+                    )
+
     db.flush()
     db.commit()
     db.refresh(to_update)
