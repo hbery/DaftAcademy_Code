@@ -46,14 +46,14 @@ class SupplierProduct(BaseModel):
   
 class ReturnSupplier(BaseModel):
 	SupplierID: PositiveInt
-	CompanyName: str
-	ContactName: str
-	ContactTitle: str
-	Address: str
-	City: str
-	PostalCode: str
-	Country: str
-	Phone: str
+	CompanyName: Optional[str]
+	ContactName: Optional[str]
+	ContactTitle: Optional[str]
+	Address: Optional[str]
+	City: Optional[str]
+	PostalCode: Optional[str]
+	Country: Optional[str]
+	Phone: Optional[str]
 	Fax: Optional[str]
 	HomePage: Optional[str]
 
@@ -63,13 +63,13 @@ class ReturnSupplier(BaseModel):
 
 class PostSupplier(BaseModel):
 	CompanyName: str
-	ContactName: Optional[str] = "Test Contact Name"
-	ContactTitle: Optional[str] = "Unknown"
-	Address: Optional[str] = "Test Address"
-	City: Optional[str] = "Test City"
-	PostalCode: Optional[str] = "123-123"
-	Country: Optional[str] = "Unknown"
-	Phone: Optional[str] = "123-123-123"
+	ContactName: Optional[str] # = "Test Contact Name"
+	ContactTitle: Optional[str] # = "Unknown"
+	Address: Optional[str] # = "Test Address"
+	City: Optional[str] # = "Test City"
+	PostalCode: Optional[str] # = "123-123"
+	Country: Optional[str] # = "Unknown"
+	Phone: Optional[str] # = "123-123-123"
 
 	class Config:
 		orm_mode = True
