@@ -1,5 +1,5 @@
+from typing import Optional
 from pydantic import BaseModel, PositiveInt
-from pydantic.fields import T
 
 class Message(BaseModel):
 	message: str
@@ -40,6 +40,49 @@ class SupplierProduct(BaseModel):
 	ProductName: str
 	Category: CategoryData
 	Discontinued: int
+
+	class Config:
+		orm_mode = True
+  
+class ReturnSupplier(BaseModel):
+	SupplierID: PositiveInt
+	CompanyName: str
+	ContactName: str
+	ContactTitle: str
+	Address: str
+	City: str
+	PostalCode: str
+	Country: str
+	Phone: str
+	Fax: Optional[str]
+	HomePage: Optional[str]
+
+	class Config:
+		orm_mode = True
+  
+
+class PostSupplier(BaseModel):
+	CompanyName: str
+	ContactName: Optional[str] = "Test Contact Name"
+	ContactTitle: Optional[str] = "Unknown"
+	Address: Optional[str] = "Test Address"
+	City: Optional[str] = "Test City"
+	PostalCode: Optional[str] = "123-123"
+	Country: Optional[str] = "Unknown"
+	Phone: Optional[str] = "123-123-123"
+
+	class Config:
+		orm_mode = True
+
+class UpdateSupplier(BaseModel):
+	CompanyName: Optional[str]
+	ContactName: Optional[str]
+	ContactTitle: Optional[str]
+	Address: Optional[str]
+	City: Optional[str]
+	PostalCode: Optional[str]
+	Country: Optional[str]
+	Phone: Optional[str]
 
 	class Config:
 		orm_mode = True

@@ -158,7 +158,28 @@ class Supplier(Base):
     Phone = Column(String(24))
     Fax = Column(String(24))
     HomePage = Column(Text)
-
+    
+    def update(self, *, CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone, Fax, HomePage):
+        if not CompanyName:
+            self.CompanyName = CompanyName
+        if not ContactName:
+            self.ContactName = ContactName
+        if not ContactTitle:
+            self.ContactTitle = ContactTitle
+        if not Address:
+            self.Address = Address
+        if not City:
+            self.City = City
+        if not PostalCode:
+            self.PostalCode = PostalCode
+        if not Country:
+            self.Country = Country
+        if not Phone:
+            self.Phone = Phone
+        if not Fax:
+            self.Fax = Fax
+        if not HomePage:
+            self.HomePage = HomePage
 
 class Territory(Base):
     __tablename__ = 'territories'
@@ -175,3 +196,20 @@ t_usstates = Table(
     Column('StateAbbr', String(2)),
     Column('StateRegion', String(50))
 )
+
+
+# t_suppliers = Table(
+#     'suppliers', metadata,
+#     Column(SmallInteger, primary_key=True),
+#     Column(String(40), nullable=False),
+#     Column(String(30)),
+#     Column(String(30)),
+#     Column(String(60)),
+#     Column(String(15)),
+#     Column(String(15)),
+#     Column(String(10)),
+#     Column(String(15)),
+#     Column(String(24)),
+#     Column(String(24)),
+#     Column(Text),
+# )
