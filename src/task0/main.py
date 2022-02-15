@@ -1,6 +1,6 @@
 import os
-import pprint
 from algorithm import search_min_path
+
 
 def populate_labels(entry_triangle: dict) -> dict:
     labels = {}
@@ -8,13 +8,14 @@ def populate_labels(entry_triangle: dict) -> dict:
         for idx, element in enumerate(elements):
             label = "{}_{}".format(layer, idx+1)
             labels[label] = element
-    
+
     start = labels['1_1']
     del labels['1_1']
     labels['START'] = start
     labels['END'] = start
 
     return labels
+
 
 def create_graph(labels: dict, size: int) -> dict:
     graph = {}
@@ -33,11 +34,16 @@ def create_graph(labels: dict, size: int) -> dict:
             left_child = int(index)
             right_child = int(index) + 1
 
-            lneigh_label = None if (left_neighbor < 1) else "{}_{}".format(int(layer), left_neighbor)
-            rneigh_label = None if (right_neighbor > int(layer)) else "{}_{}".format(int(layer), right_neighbor)
-            lchild_label = "END" if (int(layer) == size) else "{}_{}".format(int(layer)+1, left_child)
-            rchild_label = None if (lchild_label == "END") else "{}_{}".format(int(layer)+1, right_child)
-            surroundings = [ lneigh_label, rneigh_label, lchild_label, rchild_label ]
+            lneigh_label = None if (left_neighbor < 1) \
+                else "{}_{}".format(int(layer), left_neighbor)
+            rneigh_label = None if (right_neighbor > int(layer)) \
+                else "{}_{}".format(int(layer), right_neighbor)
+            lchild_label = "END" if (int(layer) == size) \
+                else "{}_{}".format(int(layer)+1, left_child)
+            rchild_label = None if (lchild_label == "END") \
+                else "{}_{}".format(int(layer)+1, right_child)
+            surroundings = [lneigh_label, rneigh_label,
+                            lchild_label, rchild_label]
 
             for element in surroundings:
                 if element is not None:
@@ -76,19 +82,20 @@ def main():
     SIZE = len(triangle)
 
     labels = populate_labels(triangle)
-    #print(labels)
+    # print(labels)
 
     graph = create_graph(labels, SIZE)
-    #pprint.pprint(graph)
+    # pprint.pprint(graph)
 
     result = search_min_path(graph)
-    #print(result)
+    # print(result)
 
     remapped_result = remap_labels(result, labels)
     print(f"Path: {remapped_result}")
 
     summed_path = sum_path(remapped_result)
     print(f"Sum: {summed_path}")
+
 
 if __name__ == "__main__":
     main()

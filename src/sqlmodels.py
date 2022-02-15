@@ -1,5 +1,14 @@
-# coding: utf-8
-from sqlalchemy import Column, Date, Float, Integer, LargeBinary, SmallInteger, String, Table, Text
+from sqlalchemy import (
+    Column,
+    Date,
+    Float,
+    Integer,
+    LargeBinary,
+    SmallInteger,
+    String,
+    Table,
+    Text
+)
 from sqlalchemy.sql.sqltypes import NullType
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -158,8 +167,18 @@ class Supplier(Base):
     Phone = Column(String(24))
     Fax = Column(String(24))
     HomePage = Column(Text)
-    
-    def update(self, *, CompanyName, ContactName, ContactTitle, Address, City, PostalCode, Country, Phone, Fax, HomePage):
+
+    def update(self, *,
+               CompanyName,
+               ContactName,
+               ContactTitle,
+               Address,
+               City,
+               PostalCode,
+               Country,
+               Phone,
+               Fax,
+               HomePage):
         if not CompanyName:
             self.CompanyName = CompanyName
         if not ContactName:
@@ -181,6 +200,7 @@ class Supplier(Base):
         if not HomePage:
             self.HomePage = HomePage
 
+
 class Territory(Base):
     __tablename__ = 'territories'
 
@@ -196,20 +216,3 @@ t_usstates = Table(
     Column('StateAbbr', String(2)),
     Column('StateRegion', String(50))
 )
-
-
-# t_suppliers = Table(
-#     'suppliers', metadata,
-#     Column(SmallInteger, primary_key=True),
-#     Column(String(40), nullable=False),
-#     Column(String(30)),
-#     Column(String(30)),
-#     Column(String(60)),
-#     Column(String(15)),
-#     Column(String(15)),
-#     Column(String(10)),
-#     Column(String(15)),
-#     Column(String(24)),
-#     Column(String(24)),
-#     Column(Text),
-# )

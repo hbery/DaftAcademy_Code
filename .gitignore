@@ -131,17 +131,3 @@ dmypy.json
 # Ignore VSCode, JetBrains, Atom, SublimeText
 .idea/
 .vscode/
-
-# Ignore model's weights
-src/model/yolov4.weights
-src/model/yolov3-tiny.weights
-src/model/yolov3.weights
-
-# Ignore sample input Video to be analyzed
-src/source/*.*
-
-# Ignore log file
-src/source/sampleVideo_rendered.log
-
-# Ignore libvlc.dll
-dlls/libvlc.dll
